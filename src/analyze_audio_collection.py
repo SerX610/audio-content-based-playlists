@@ -45,8 +45,8 @@ AROUSAL_VALENCE_MODEL_PATH = f"{MODELS_PATH}emomusic-msd-musicnn-2.pb"
 # ===========================
 
 # Path for the output JSON file
-OUTPUT_JSON_FILE_PATH = "../audio_features.json"
-
+OUTPUT_JSON_FILE_PATH = "../data/musav_analysis.json"
+FILE_ANALYSIS_MAX_RETRIES = 3
 
 def get_audio_files_paths(audios_folder, files_extension=".mp3"):
     """
@@ -66,6 +66,20 @@ def get_audio_files_paths(audios_folder, files_extension=".mp3"):
     ]
 
 
+def load_existing_results(json_file_path):
+    """Load existing results from the JSON file if it exists."""
+    if os.path.exists(json_file_path):
+        with open(json_file_path, "r") as f:
+            return json.load(f)
+    return []
+
+
+def save_results_incrementally(json_file_path, results):
+    """Save results incrementally to the JSON file."""
+    with open(json_file_path, "w") as f:
+        json.dump(results, f, indent=4)
+
+
 def main():
 
     # Load audio file paths
@@ -76,6 +90,13 @@ def main():
         print(f"No {AUDIO_FILES_EXTENSION} files found in: {PATH_TO_MUSAV}")
         return
     
+    # Load existing results if the JSON file exists
+    collection_features = load_existing_results(OUTPUT_JSON_FILE_PATH)
+    processed_files = {result["path"] for result in collection_features}
+
+    # Track retries for each file
+    retry_count = {}
+
     # Initialize audio processing components
     mono_mixer = es.MonoMixer()
     resampler = es.Resample(inputSampleRate=RESAMPLE_INPUT_SAMPLE_RATE, outputSampleRate=RESAMPLE_TARGET_SAMPLE_RATE)
@@ -95,21 +116,45 @@ def main():
     danceability_model = es.TensorflowPredict2D(graphFilename=DANCEABILITY_MODEL_PATH, output="model/Softmax")
     arousal_valence_model = es.TensorflowPredict2D(graphFilename=AROUSAL_VALENCE_MODEL_PATH, output="model/Identity")
 
-    # Extract features from all audios in the collection
-    collection_features = []
-    for audio_file_path in tqdm(audio_files_path, desc="Processing audio files"):
-        analyzer = AudioAnalyzer(audio_file_path, mono_mixer, resampler,
-                                 tempo_extractor, key_extractors, loudness_extractor,
-                                 discogs_embeddings_model, musiccnn_embeddings_model, genres_model,
-                                 voice_instrumental_model, danceability_model, arousal_valence_model)
+    # Keep running until all files are processed
+    while len(processed_files) < len(audio_files_path):
+       
+        # Extract features from all audios in the collection
+        for audio_file_path in tqdm(audio_files_path, desc="Processing audio files"):
 
-        collection_features.append(analyzer.extract_features())
+            if audio_file_path in processed_files:
+                continue  # Skip already processed files
+            
+            try:
+                # Create an instance of AudioAnalyzer
+                analyzer = AudioAnalyzer(audio_file_path, mono_mixer, resampler,
+                                         tempo_extractor, key_extractors, loudness_extractor,
+                                         discogs_embeddings_model, musiccnn_embeddings_model,
+                                         genres_model, voice_instrumental_model, 
+                                         danceability_model, arousal_valence_model)
 
-    # Save extracted features to JSON
-    with open(OUTPUT_JSON_FILE_PATH, "w", encoding="utf-8") as f:
-        json.dump(collection_features, f, indent=4)
-    
-    print(f"Features saved to {OUTPUT_JSON_FILE_PATH}")
+                # Extract features
+                audio_features = analyzer.extract_features()
+
+                # Append the features to the list
+                collection_features.append(audio_features)
+
+                # Save results incrementally
+                save_results_incrementally(OUTPUT_JSON_FILE_PATH, collection_features)
+                
+                # Mark the file as processed
+                processed_files.add(audio_file_path)
+
+            except Exception as e:
+                print(f"Error analyzing {audio_file_path}: {e}")
+                retry_count[audio_file_path] = retry_count.get(audio_file_path, 0) + 1
+
+                # Skip the file if max retries reached
+                if retry_count[audio_file_path] >= FILE_ANALYSIS_MAX_RETRIES:
+                    print(f"Skipping {audio_file_path} after {FILE_ANALYSIS_MAX_RETRIES} retries")
+                    processed_files.add(audio_file_path)
+
+    print(f"All files processed. Features saved to {OUTPUT_JSON_FILE_PATH}")
 
 
 if __name__=="__main__":
