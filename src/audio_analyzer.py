@@ -1,15 +1,40 @@
+"""
+This module provides an AudioAnalyzer class for extracting audio features
+using Essentia models. It supports tempo, key, loudness, embeddings, and
+various classification activations (e.g., genre, danceability, arousal-
+valence). The class processes audio files and returns extracted features
+in a structured format for further analysis.
+"""
+
 import essentia.standard as es
 import numpy as np
+
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-positional-arguments
+# pylint: disable=no-member
 
 
 class AudioAnalyzer:
     """
     Extracts audio features using Essentia and deep learning models.
     """
-    def __init__(self, audio_file_path, mono_mixer, resampler, tempo_extractor,
-                 key_extractors, loudness_extractor, discogs_embeddings_model,
-                 musiccnn_embeddings_model, genres_model, voice_instrumental_model,
-                 danceability_model, arousal_valence_model):
+
+    def __init__(
+        self,
+        audio_file_path,
+        mono_mixer,
+        resampler,
+        tempo_extractor,
+        key_extractors,
+        loudness_extractor,
+        discogs_embeddings_model,
+        musiccnn_embeddings_model,
+        genres_model,
+        voice_instrumental_model,
+        danceability_model,
+        arousal_valence_model,
+    ):
         """
         Initializes the AudioAnalyzer and loads the audio file.
 
@@ -23,7 +48,8 @@ class AudioAnalyzer:
             discogs_embeddings_model: Discogs-based embeddings model.
             musiccnn_embeddings_model: MusicCNN embeddings model.
             genres_model: Model for genre classification.
-            voice_instrumental_model: Model for voice vs. instrumental classification.
+            voice_instrumental_model: Model for voice vs. instrumental
+                classification.
             danceability_model: Model for danceability classification.
             arousal_valence_model: Model for arousal-valence classification.
         """
@@ -39,16 +65,24 @@ class AudioAnalyzer:
         self.voice_instrumental_model = voice_instrumental_model
         self.danceability_model = danceability_model
         self.arousal_valence_model = arousal_valence_model
-        
+
         # Load and process the audio
         self.stereo_audio = self._load_stereo_audio(self.audio_file_path)
-        self.mono_audio = self._convert_to_mono(self.stereo_audio, self.mono_mixer)
-        self.resampled_audio = self._resample_audio(self.mono_audio, self.resampler)
-        
+        self.mono_audio = self._convert_to_mono(
+            self.stereo_audio, self.mono_mixer
+        )
+        self.resampled_audio = self._resample_audio(
+            self.mono_audio, self.resampler
+        )
+
         # Compute embeddings
-        self.discogs_embeddings = self.get_embeddings(self.resampled_audio, self.discogs_embeddings_model)
-        self.musiccnn_embeddings = self.get_embeddings(self.resampled_audio, self.musiccnn_embeddings_model)
-        
+        self.discogs_embeddings = self.get_embeddings(
+            self.resampled_audio, self.discogs_embeddings_model
+        )
+        self.musiccnn_embeddings = self.get_embeddings(
+            self.resampled_audio, self.musiccnn_embeddings_model
+        )
+
     def _load_stereo_audio(self, audio_file_path):
         """
         Load the audio file in stereo format using AudioLoader.
@@ -100,14 +134,15 @@ class AudioAnalyzer:
             list: Averaged feature values.
         """
         return np.mean(frames, axis=0).tolist()
-    
+
     def get_tempo(self, mono_audio, tempo_extractor):
         """
         Extract the estimated tempo (BPM) from mono audio.
 
         Args:
             mono_audio (numpy.ndarray): Mono audio data.
-            tempo_extractor (RhythmExtractor2013 or TempoCNN): Tempo extraction model.
+            tempo_extractor (RhythmExtractor2013 or TempoCNN): Tempo
+                extraction model.
 
         Returns:
             float: Estimated BPM.
@@ -181,13 +216,23 @@ class AudioAnalyzer:
             "path": self.audio_file_path,
             "tempo": self.get_tempo(self.mono_audio, self.tempo_extractor),
             "key": self.get_key(self.mono_audio, self.key_extractors),
-            "loudness": self.get_loudness(self.stereo_audio, self.loudness_extractor),
+            "loudness": self.get_loudness(
+                self.stereo_audio, self.loudness_extractor
+            ),
             "embeddings": {
                 "discogs": self._average_frames(self.discogs_embeddings),
                 "musiccnn": self._average_frames(self.musiccnn_embeddings),
             },
-            "music_styles_activations": self.get_activations(self.discogs_embeddings, self.genres_model),
-            "voice_instrumental_activations": self.get_activations(self.discogs_embeddings, self.voice_instrumental_model),
-            "danceability_activations": self.get_activations(self.discogs_embeddings, self.danceability_model),
-            "arousal_valence_activations": self.get_activations(self.musiccnn_embeddings, self.arousal_valence_model),
+            "music_styles_activations": self.get_activations(
+                self.discogs_embeddings, self.genres_model
+            ),
+            "voice_instrumental_activations": self.get_activations(
+                self.discogs_embeddings, self.voice_instrumental_model
+            ),
+            "danceability_activations": self.get_activations(
+                self.discogs_embeddings, self.danceability_model
+            ),
+            "arousal_valence_activations": self.get_activations(
+                self.musiccnn_embeddings, self.arousal_valence_model
+            ),
         }
