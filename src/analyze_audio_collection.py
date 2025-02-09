@@ -1,10 +1,8 @@
-import json
-import os
-
 import essentia
 import essentia.standard as es
 from tqdm import tqdm
 
+import utils as u
 from audio_analyzer import AudioAnalyzer
 
 essentia.log.warningActive = False  # Suppress Essentia warnings
@@ -46,44 +44,15 @@ AROUSAL_VALENCE_MODEL_PATH = f"{MODELS_PATH}emomusic-msd-musicnn-2.pb"
 
 # Path for the output JSON file
 OUTPUT_JSON_FILE_PATH = "../data/musav_analysis.json"
+
+# Maximum number of retries for file analysis
 FILE_ANALYSIS_MAX_RETRIES = 3
-
-def get_audio_files_paths(audios_folder, files_extension=".mp3"):
-    """
-    Recursively find all audio files with the given extension in the directory.
-    
-    Args:
-        audios_folder (str): Path to the folder containing audio files.
-        files_extension (str): File extension to search for (default: ".mp3").
-    
-    Returns:
-        list: List of file paths matching the extension.
-    """
-    return [
-        os.path.join(root, file)
-        for root, _, files in os.walk(audios_folder)
-        for file in files if file.lower().endswith(files_extension)
-    ]
-
-
-def load_existing_results(json_file_path):
-    """Load existing results from the JSON file if it exists."""
-    if os.path.exists(json_file_path):
-        with open(json_file_path, "r") as f:
-            return json.load(f)
-    return []
-
-
-def save_results_incrementally(json_file_path, results):
-    """Save results incrementally to the JSON file."""
-    with open(json_file_path, "w") as f:
-        json.dump(results, f, indent=4)
 
 
 def main():
 
     # Load audio file paths
-    audio_files_path = get_audio_files_paths(PATH_TO_MUSAV, AUDIO_FILES_EXTENSION)
+    audio_files_path = u.get_audio_files_paths(PATH_TO_MUSAV, AUDIO_FILES_EXTENSION)
     
     # Exit if no files found
     if not audio_files_path:
@@ -91,7 +60,7 @@ def main():
         return
     
     # Load existing results if the JSON file exists
-    collection_features = load_existing_results(OUTPUT_JSON_FILE_PATH)
+    collection_features = u.load_data_from_json(OUTPUT_JSON_FILE_PATH)
     processed_files = {result["path"] for result in collection_features}
 
     # Track retries for each file
@@ -140,7 +109,7 @@ def main():
                 collection_features.append(audio_features)
 
                 # Save results incrementally
-                save_results_incrementally(OUTPUT_JSON_FILE_PATH, collection_features)
+                u.save_data_to_json(OUTPUT_JSON_FILE_PATH, collection_features)
                 
                 # Mark the file as processed
                 processed_files.add(audio_file_path)
