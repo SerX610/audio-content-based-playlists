@@ -14,6 +14,8 @@ For that, we will use the [MusAV](https://repositori.upf.edu/items/ea4c4a4c-958f
 
 For more information about the implementation, design, and obtained results, check the [Report.pdf](Report.pdf).
 
+#### ----- TODO: ADD REPORT -----
+
 
 ## Setup
 
@@ -86,4 +88,14 @@ This opens the **Similarities App**, where you can generate playlists by retriev
 
 ## Demo
 
-#### ----- TODO: ADD DEMO FOR THE APPS -----
+### Queries App
+
+Watch a demo for the **Queries App** using the link below:
+
+https://drive.google.com/file/d/1A1zhLs10DHkWawCy2rDTLSI2LQ__NXJe/view?usp=sharing
+
+### Similarities App
+
+Watch a demo for the **Similarities App** using the link below:
+
+https://drive.google.com/file/d/10MFfSNtDuPAAWhNMnyKqs2rW3PWAf_-3/view?usp=sharing
