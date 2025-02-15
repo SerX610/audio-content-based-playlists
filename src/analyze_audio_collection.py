@@ -57,7 +57,7 @@ AROUSAL_VALENCE_MODEL_PATH = f"{MODELS_PATH}emomusic-msd-musicnn-2.pb"
 # ===========================
 
 # Path for the output JSON file
-OUTPUT_JSON_FILE_PATH = "../data/musav_analysis.json"
+OUTPUT_JSON_FILE_PATH = "../results/musav_analysis.json"
 
 # Maximum number of retries for file analysis
 FILE_ANALYSIS_MAX_RETRIES = 3

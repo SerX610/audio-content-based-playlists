@@ -21,7 +21,7 @@ import utils as u
 
 
 # Path to the audio analysis data
-AUDIO_ANALYSIS_PATH = "data/musav_analysis.json"
+AUDIO_ANALYSIS_PATH = "results/musav_analysis.json"
 
 # Path to the Discogs metadata file
 STYLE_METADATA_FILE_PATH = "data/discogs-effnet-bs64-1.json"

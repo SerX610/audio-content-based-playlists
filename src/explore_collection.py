@@ -18,7 +18,7 @@ import utils as u
 # ===========================
 
 # Path to the JSON file containing music collection data
-COLLECTION_JSON_FILE_PATH = "../data/musav_analysis.json"
+COLLECTION_JSON_FILE_PATH = "../results/musav_analysis.json"
 
 # Path to the Discogs metadata JSON file
 STYLE_METADATA_FILE_PATH = "../data/discogs-effnet-bs64-1.json"

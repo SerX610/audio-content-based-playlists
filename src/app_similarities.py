@@ -18,7 +18,7 @@ import utils as u
 
 
 # Path to the audio analysis data
-AUDIO_ANALYSIS_PATH = "data/musav_analysis.json"
+AUDIO_ANALYSIS_PATH = "results/musav_analysis.json"
 
 # Path to save the M3U playlists
 M3U_DISCOGS_FILEPATHS_FILE = "playlists/similarities_playlist_discogs.m3u8"
