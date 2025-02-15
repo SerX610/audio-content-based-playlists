@@ -1,7 +1,5 @@
 # Audio Content Based Playlists
 
-#### _THIS PROJECT IS STILL UNDER DEVELOPMENT [EXPECTED END DATE: 16/02/2025]_
-
 This project has been developed for the Essentia playlists assignment in the context of the "Audio and Music Processing Lab" course from the Master's in Sound and Music Computing at Universitat Pompeu Fabra. For more information, check the [Assignment.pdf](Assignment.pdf)
 
 The goal of the project is to create tools for analyzing and previewing music in any given collection. These tools should allow us to: 
@@ -13,8 +11,6 @@ The goal of the project is to create tools for analyzing and previewing music in
 For that, we will use the [MusAV](https://repositori.upf.edu/items/ea4c4a4c-958f-4004-bdc2-e1f6ad7e6829) dataset as a small music audio collection, extract music descriptors using Essentia, generate a report about computed descriptors, and create a simple user interface to generate playlists based on these descriptors
 
 For more information about the implementation, design, and obtained results, check the [Report.pdf](Report.pdf).
-
-#### ----- TODO: ADD REPORT -----
 
 
 ## Setup
