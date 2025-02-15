@@ -14,8 +14,6 @@ For that, we will use the [MusAV](https://repositori.upf.edu/items/ea4c4a4c-958f
 
 For more information about the implementation, design, and obtained results, check the [Report.pdf](Report.pdf).
 
-#### ----- TODO: ADD REPORT -----
-
 
 ## Setup
 
